@@ -147,7 +147,7 @@ function updateHandEval(player) {
         }
     }
 
-    if total > 21 {
+    if (total > 21) {
         player.busted = true;
     }
 
