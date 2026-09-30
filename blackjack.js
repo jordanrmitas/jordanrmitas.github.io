@@ -102,7 +102,7 @@ function evaluateHand(player) {
         if (card.rank != 'Ace') {
             total += card.value;
         } else {
-            if (total + 11) > 21 {
+            if (total + 11 > 21) {
                 total += 1;
             } else {
                 total += 11;
