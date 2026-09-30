@@ -2,7 +2,28 @@
 <html>
     <meta charset="UTF-8" />
     <head>Blackjack Simulator</head>
-    <body>
-        <script src="./blackjack.js"></script>
-    </body>
+    <link rel="stylesheet" href="style.css">
+    <script src="blackjack.js" defer></script>
+
+    <section id="dealer">
+        <div id="Dealer">
+            <h2>Dealer</h2>
+            <div id="dealer-hand" class="hand"></div>
+            <p>Total: <span id='dealer-score' class="score"></span></p>
+        </div>
+    </section>
+
+    <section id="player">
+        <div id="Jordan">
+            <h2 id="player-name">Player</h2>
+            <div id="player-hand" class="hand"></div>
+            <p>Total: <span id='player-score' class="score"></span></p>
+        </div>
+    </section>
+
+    <p id="deal-prompt">Click Deal to start</p>
+
+    <button id="deal-button">Deal</button>
+    <button id="hit-button">Hit</button>
+    <button id="stand-button">Stand</button>
 </html>
