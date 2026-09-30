@@ -31,11 +31,7 @@ class Card {
 class Player {
     constructor(name, chips) {
         this.isPlayer = true;
-        this.name = name ?? '';
-        this.hand = null;
-        this.chips = Number(chips) ?? 0;
-
-        this.canSplit = false;
+        this.name = name ?? ''; 
         this.handTotal = false;
     }
 }
@@ -45,8 +41,7 @@ class Dealer {
         this.isDealer = true;
         this.name = "Dealer";
         this.hand = null;
-        this.handTotal = 0;
-        this.canSplit = false;
+        this.handTotal = 0;Nn
     }
 }
 
@@ -101,16 +96,17 @@ function dealCards(players, deck) {
 }
 
 function evaluateHand(player) {
-    player.canSplit = (player.hand[0].rank == player.hand[1].rank);
-    let total = [0];
+    player.canSplit = (!(isDealer)) && (player.hand[0].rank == player.hand[1].rank);
+    let total = 0;
     for (card of player.hand) {
         if (card.rank != 'Ace') {
-            total[0] += card.value;
-            if (total[1]) {total[1] += card.value;}
+            total += card.value;
         } else {
-            total[0] += card.value[0];
-            total[1] += card.value[1];
-        }
+            if (total + 11) > 21 {
+                total += 1
+            } else {
+                total += 11
+            }
     }
 
     player.handTotal = total;
@@ -133,7 +129,7 @@ function displayHands(players) {
         for (card of p.hand) {
             console.log(card.name);
         }
-        let total = p.handTotal[1] ? String(p.handTotal[0]) + "or" + String(p.handTotal[1]) : p.handTotal[0];
+        let total = p.handTotal;
         console.log(String(total))
         console.log(p.canSplit);
     }
