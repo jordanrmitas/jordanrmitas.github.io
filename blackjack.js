@@ -98,8 +98,8 @@ function dealCards(players, deck) {
 function evaluateHand(player) {
     player.canSplit = (!player.isDealer && player.hand[0].rank == player.hand[1].rank);
     let total = 0;
-    for (card of player.hand) {
-        if (card.rank != 'Ace') {
+    for (const card of player.hand) {
+        if (card.rank !== 'Ace') {
             total += card.value;
         } else {
             if (total + 11 > 21) {
