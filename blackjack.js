@@ -41,7 +41,7 @@ class Dealer {
         this.isDealer = true;
         this.name = "Dealer";
         this.hand = null;
-        this.handTotal = 0;Nn
+        this.handTotal = 0;
     }
 }
 
