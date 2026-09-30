@@ -11,6 +11,9 @@ Purple: 500
 Orange/Yellow: 1,000
 */
 
+
+//Initializing data
+
 class Card {
     constructor(rank,suit) {
         this.rank = rank;
@@ -81,10 +84,15 @@ function initPlayers(num, names) {
 
 }
 
+//Beginning the round
+
+
 function dealCards(players, deck) {
     for (p of players) {
         p.hand = [];
         p.handTotal = 0;
+        p.isDone = false;
+        p.busted = false;
     }
     for (i=1; i<3; i++) {
         for (p of players) {
@@ -113,6 +121,51 @@ function evaluateHand(player) {
     player.handTotal = total;
 }
 
+function updateHandEval(player) {
+    let aceNum = 0;
+    let total = 0;
+    
+    for (const card of player.hand) {
+        if (card.rank == "Ace") {
+            aceNum += 1;
+        } else {
+            total += card.value;
+        }   
+    }
+
+    if (aceNum > 1) {
+        if (total + aceNum + 10 > 21) {
+            total += aceNum;
+        } else {
+            total += aceNum + 10;
+        }
+    } else if (aceNum > 0) {
+        if (total + 11 > 21) {
+            total += 1;
+        } else {
+            total += 11;
+        }
+    }
+
+    if total > 21 {
+        player.busted = true;
+    }
+
+    player.handTotal = total;
+}
+
+
+//Player actions
+
+function hitMe(player) {
+    player.hand.push(deck.pop());
+}
+
+function stand(player) {
+    player.isDone = true;
+}
+
+
 var newDeck = initDeck();
 var genShuffle = shuffle(newDeck);
 var deck = genShuffle;
@@ -120,9 +173,9 @@ var players = initPlayers(3, ['John','Sara','Tony'] )
 
 
 
-console.table(newDeck);
+//console.table(newDeck);
 console.table(deck);
-console.table(players);
+//console.table(players);
 
 function displayHands(players) {
     for (p of players) {
@@ -142,5 +195,13 @@ for (p of players) {
     evaluateHand(p);
 }
 displayHands(players);
+
+for (p of players) {
+    hitMe(p);
+    updateHandEval(p);
+}
+
+console.table(players);
+
 
 
