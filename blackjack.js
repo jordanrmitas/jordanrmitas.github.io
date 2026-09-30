@@ -201,7 +201,7 @@ for (p of players) {
     updateHandEval(p);
 }
 
-console.table(players);
+displayHands(players);
 
 
 
