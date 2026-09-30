@@ -107,6 +107,7 @@ function evaluateHand(player) {
             } else {
                 total += 11;
             }
+        }
     }
 
     player.handTotal = total;
