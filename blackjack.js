@@ -96,7 +96,7 @@ function dealCards(players, deck) {
 }
 
 function evaluateHand(player) {
-    player.canSplit = (!player.isDealer) && (player.hand[0].rank == player.hand[1].rank);
+    player.canSplit = (!player.isDealer && player.hand[0].rank == player.hand[1].rank);
     let total = 0;
     for (card of player.hand) {
         if (card.rank != 'Ace') {
@@ -130,7 +130,7 @@ function displayHands(players) {
             console.log(card.name);
         }
         let total = p.handTotal;
-        console.log(String(total))
+        console.log(total)
         console.log(p.canSplit);
     }
 }
