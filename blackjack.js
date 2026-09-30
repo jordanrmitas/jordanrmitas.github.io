@@ -91,7 +91,7 @@ function dealCards(players, deck) {
             p.hand.push(deck.pop());
         }
     }
-    //for num + 1, pop value from drawdeck)
+    //for num + 1, pop value from drawdeck
     //return new deck
 }
 
@@ -103,9 +103,9 @@ function evaluateHand(player) {
             total += card.value;
         } else {
             if (total + 11) > 21 {
-                total += 1
+                total += 1;
             } else {
-                total += 11
+                total += 11;
             }
     }
 
@@ -129,8 +129,7 @@ function displayHands(players) {
         for (card of p.hand) {
             console.log(card.name);
         }
-        let total = p.handTotal;
-        console.log(total)
+        console.log(p.handTotal)
         console.log(p.canSplit);
     }
 }
