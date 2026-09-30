@@ -133,7 +133,7 @@ function displayHands(players) {
         for (card of p.hand) {
             console.log(card.name);
         }
-        let total = p.handTotal[1] ? String(p.handTotal[0]) + "or" + p.handTotal[1] : p.handTotal[0];
+        let total = p.handTotal[1] ? String(p.handTotal[0]) + "or" + String(p.handTotal[1]) : p.handTotal[0];
         console.log(String(total))
         console.log(p.canSplit);
     }
