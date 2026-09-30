@@ -27,7 +27,6 @@ class Card {
         } else {
             this.value = 11;
         }
-
     }
 }
 
@@ -36,6 +35,7 @@ class Player {
         this.isPlayer = true;
         this.name = name ?? ''; 
         this.handTotal = false;
+        this.chips = chips ?? 100;
     }
 }
 
@@ -48,11 +48,14 @@ class Dealer {
     }
 }
 
-function initDeck() {
+function initDeck(num) {
     let deck = [];
-    for (s of suits) {
-        for (r of ranks) {
-            deck.push(new Card(r,s));
+    const numOfDecks = num ?? 1;
+    for (let i=1; i <= numOfDecks; i++) {
+        for (s of suits) {
+            for (r of ranks) {
+                deck.push(new Card(r,s));
+            }
         }
     }
 
@@ -72,6 +75,18 @@ function shuffle(deck) {
     return shuffledDeck; //returns a new deck with references to original objects
 }
 
+function doubleShuffle(deck) {
+    d = shuffle(deck);
+    let l = d.length;
+    let newD = [];
+    for (i=0; i < l; i++) {
+        newD.push(d.pop());
+    }
+    finalD = shuffle(newD);
+
+    return finalD;
+}
+
 function initPlayers(num, names) {
     let players = [];
     for (i=0; i<num; i++) {
@@ -86,21 +101,26 @@ function initPlayers(num, names) {
 
 //Beginning the round
 
+function clearData(p) {
+    p.hand = [];
+    p.handTotal = 0;
+    p.isDone = false;
+    p.busted = false;
+    p.hasBlackjack = false; 
+    p.wager = 0;  
+    p.winnings = 0;
+}
+
 
 function dealCards(players, deck) {
     for (p of players) {
-        p.hand = [];
-        p.handTotal = 0;
-        p.isDone = false;
-        p.busted = false;
+        clearData(p);
     }
     for (i=1; i<3; i++) {
         for (p of players) {
             p.hand.push(deck.pop());
         }
     }
-    //for num + 1, pop value from drawdeck
-    //return new deck
 }
 
 function evaluateHand(player) {
@@ -118,7 +138,11 @@ function evaluateHand(player) {
         }
     }
 
+    if (total == 21) {
+        player.hasBlackjack = true;
+    }
     player.handTotal = total;
+
 }
 
 function updateHandEval(player) {
@@ -157,39 +181,132 @@ function updateHandEval(player) {
 
 //Player actions
 
+function wager(player,chips) {
+    if (chips > player.chips || chips < 1) {
+        return
+    } else {
+        player.chips -= chips;
+        player.wager = chips;
+    }
+}
+
 function hitMe(player) {
     player.hand.push(deck.pop());
+    updateHandEval(player);
 }
 
 function stand(player) {
     player.isDone = true;
 }
 
+function dealerTurn(dealer) {
+    while (dealer.handTotal < 17) {
+        hitMe(dealer);
+    }
+}
 
-var newDeck = initDeck();
-var genShuffle = shuffle(newDeck);
-var deck = genShuffle;
-var players = initPlayers(3, ['John','Sara','Tony'] )
+//End of round
 
+function winnings(player, dealer) {
+    if (player.busted) {
+        player.winnings = 0;
+        player.wager = 0;
+    } else if (dealer.hasBlackjack) {
+        if (player.hasBlackjack) {
+            player.winnings = 0;
+        } else {
+            player.winnings = 0;
+            player.wager = 0;
+        }
+    } else {
+        if (player.hasBlackjack) {
+            player.winnings = Math.ceil(1.5*player.wager);
+        } else if (player.handTotal > dealer.handTotal) {
+            player.winnings = player.wager;
+        } else if (player.handTotal == dealer.handTotal) {
+            player.winnings = 0;
+        } else {
+            player.winnings = 0;
+            player.wager = 0;
+        }
+    }
+}
 
+//Game Loop
 
-//console.table(newDeck);
-console.table(deck);
-//console.table(players);
-
-function displayHands(players) {
+/*function displayHands(players) {
     for (p of players) {
         console.log(`${p.name}:`);
         for (card of p.hand) {
             console.log(card.name);
         }
-        console.log(p.handTotal)
-        console.log(p.canSplit);
+        if (p.handTotal > 21) {
+            console.log("Busted.")
+        } else {
+            console.log(p.handTotal)
+        }
+        //console.log(p.canSplit);
     }
+} */
+
+var newDeck = initDeck(2);
+var deck = doubleShuffle(newDeck);
+var players = initPlayers(1, ['Jordan'])
+
+const player1 = document.getElementById("player-name");
+player1.innerHTML = players[0].name;
+
+
+
+//HTML stuff
+
+function displayHand(player) {
+    const p = document.getElementById(player.name);
+    const handElt = p.querySelector(".hand");
+    handElt.innerHTML = '';
+    const score = p.querySelector(".score");
+    score.innerHTML = player.handTotal;
+
+    for (const card of player.hand) {
+        const cardElt = document.createElement("div");
+        cardElt.classList.add("card");
+        cardElt.textContent = card.name;
+
+        handElt.appendChild(cardElt);
+    }
+
 }
 
+document.getElementById("deal-button").addEventListener("click", function () {
+    dealCards(players,deck);
+    for (const p of players) {
+        evaluateHand(p);
+    }
+    displayHand(players[0]);
+    displayHand(players[1]);
+})
+
+document.getElementById("hit-button").addEventListener("click", function () {
+    hitMe(players[0]);
+    displayHand(players[0]);
+})
+
+document.getElementById("stand-button").addEventListener("click", function () {
+    dealerTurn(players[1]);
+    displayHand(players[1]);
+})
+//dealCards(players,deck);
+
+
+/*
+//console.table(newDeck);
+//console.table(deck);
+//console.table(players);
+
+
 dealCards(players,deck);
-console.table(players);
+//console.table(players);
+
 for (p of players) {
     console.table(p.hand);
     evaluateHand(p);
@@ -197,11 +314,13 @@ for (p of players) {
 displayHands(players);
 
 for (p of players) {
-    hitMe(p);
-    updateHandEval(p);
+    if (!p.isDealer) {
+        hitMe(p);
+        updateHandEval(p);
+    } else {
+        dealerTurn(p);
+    }
 }
 
 displayHands(players);
-
-
-
+*/
