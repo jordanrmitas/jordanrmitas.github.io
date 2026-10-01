@@ -1,0 +1,21 @@
+Blackjack javascript
+Have a function that creates card data.
+- Now, create an object called "card" with "rank" and "suit" properties. The collection of such cards is the actual deck.
+- Create a function that returns a shuffled deck (do not modify the existing one). This becomes a new deck.
+- Make a copy of this deck to draw from. Each time a card is drawn, remove it from the array.
+- Create a "dealing" function that passes cards out to each player as well as the dealer (you can choose how many players and how many decks are allowed)
+- Create a function that evaluates a hand (adds up point values, returns two values if holding ace(s)).
+- Create a 'betting' mechanic, where you can click and drag chips into the wagering area.
+
+Game Loop:
+1. Players place their bets
+2. Cards are dealt to each player.
+3. Dealer checks for blackjack (if up card is an ace)
+4. Players choose insurance, surrender, split, hit, or stand.
+5. Play moves around until all players have completed their turns.
+6. Dealer plays their automated turn
+7. Winnings are distributed to respective players.
+
+
+In the future:
+Create a "seed" that generates the game's RNG.
