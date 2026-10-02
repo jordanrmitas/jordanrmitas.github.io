@@ -33,9 +33,10 @@ class Card {
 class Player {
     constructor(name, chips) {
         this.isPlayer = true;
-        this.name = name ?? ''; 
+        this.name = (name && typeof name === "string" && name.trim()) ? name : 'Default Player'; 
         this.handTotal = false;
         this.chips = chips ?? 100;
+        this.id = this.name ? this.name.trim().toLowerCase().replaceAll(" ", "-") : "default-player";
     }
 }
 
@@ -45,6 +46,7 @@ class Dealer {
         this.name = "Dealer";
         this.hand = null;
         this.handTotal = 0;
+        this.id = "dealer";
     }
 }
 
@@ -87,16 +89,27 @@ function doubleShuffle(deck) {
     return finalD;
 }
 
-function initPlayers(num, names) {
+function initPlayers(num, names, chips) {
     let players = [];
     for (i=0; i<num; i++) {
-        players.push(new Player(names[i],100));
+        if (!names) {
+            players.push(new Player(`Player ${i+1}`, chips));
+        } else {
+            players.push(new Player(names[i], chips));
+        }
     }
 
     players.push(new Dealer());
 
     return players;
 
+}
+
+function initializePlayers(n) {
+    const players = initPlayers(n);
+    clearAllData(players);
+
+    return players
 }
 
 //Beginning the round
@@ -111,6 +124,11 @@ function clearData(p) {
     p.winnings = 0;
 }
 
+function clearAllData(players) {
+    for (p of players) {
+        clearData(p);
+    }
+}
 
 function dealCards(players, deck) {
     for (p of players) {
@@ -120,6 +138,10 @@ function dealCards(players, deck) {
         for (p of players) {
             p.hand.push(deck.pop());
         }
+    }
+
+    for (p of players) {
+        evaluateHand(p);
     }
 }
 
@@ -249,19 +271,11 @@ function winnings(player, dealer) {
     }
 } */
 
-var newDeck = initDeck(2);
-var deck = doubleShuffle(newDeck);
-var players = initPlayers(1, ['Jordan'])
-
-const player1 = document.getElementById("player-name");
-player1.innerHTML = players[0].name;
-
-
 
 //HTML stuff
 
 function displayHand(player) {
-    const p = document.getElementById(player.name);
+    const p = document.getElementById(`player-${player.id}`);
     const handElt = p.querySelector(".hand");
     handElt.innerHTML = '';
     const score = p.querySelector(".score");
@@ -277,7 +291,13 @@ function displayHand(player) {
 
 }
 
-document.getElementById("deal-button").addEventListener("click", function () {
+function displayAllHands(players) {
+    for (player of players) {
+        displayHand(player);
+    }
+}
+
+/*document.getElementById("deal-button").addEventListener("click", function () {
     dealCards(players,deck);
     for (const p of players) {
         evaluateHand(p);
@@ -294,7 +314,91 @@ document.getElementById("hit-button").addEventListener("click", function () {
 document.getElementById("stand-button").addEventListener("click", function () {
     dealerTurn(players[1]);
     displayHand(players[1]);
+}) */
+
+
+////////////////////////////////////////////////////////////////////HTML Functions////////////////////////////////////////////////////////////////////
+
+function createPlayerElt(player) {
+    const p = document.createElement("div");
+    p.id = `player-${player.id}`;
+
+    const nameDisplay = document.createElement("h2");
+    nameDisplay.id = "player-name";
+    nameDisplay.innerText = player.name;
+
+    const playerHand = document.createElement("div");
+    playerHand.id = "player-hand";
+    playerHand.classList.add("hand");
+
+    const scoreDisplay = document.createElement("p");
+    scoreDisplay.innerHTML = `Total: <span id="player-hand-total" class="score">${player.handTotal}</span>`;
+
+    p.appendChild(nameDisplay);
+    p.appendChild(playerHand);
+    p.appendChild(scoreDisplay);
+    
+    return p;
+}
+
+function createDealerElt(dealer) {
+    const d = document.createElement("div");
+    d.id = `player-${dealer.id}`;
+
+    const nameDisplay = document.createElement("h2");
+    nameDisplay.id = "dealer-name";
+    nameDisplay.innerText = dealer.name;
+
+    const dealerHand = document.createElement("div");
+    dealerHand.id = "dealer-hand";
+    dealerHand.classList.add("hand");
+
+    const scoreDisplay = document.createElement("p");
+    scoreDisplay.innerHTML = `Total: <span id="dealer-hand-total" class="score">${dealer.handTotal}</span>`;
+
+    d.appendChild(nameDisplay);
+    d.appendChild(dealerHand);
+    d.appendChild(scoreDisplay);
+    
+    return d;
+}
+
+function initializeGameElts(players) {
+    const playerEnv = document.getElementById("players");
+    const dealerEnv = document.getElementById("dealer");
+
+    for (p of players) {
+        if (!p.isDealer) {
+            pElt = createPlayerElt(p);
+            playerEnv.appendChild(pElt);
+        } else {
+            dElt = createDealerElt(p);
+            dealerEnv.appendChild(dElt);
+        }
+    }
+}
+
+const form1 = document.getElementById("initial-form")
+const playerNumInput = document.getElementById("number-of-players");
+
+form1.addEventListener("submit", function(event) {
+    event.preventDefault();
+    const playerNum = parseInt(playerNumInput.value);
+    const players = initializePlayers(playerNum);
+    const deck = doubleShuffle(initDeck(2));
+    initializeGameElts(players);
+
+    const setup = document.getElementById("setup-env");
+    const game = document.getElementById("game-env");
+    setup.hidden = true;
+    game.hidden = false;
+
+    dealCards(players,deck);
+    displayAllHands(players);
+
+
 })
+
 //dealCards(players,deck);
 
 
